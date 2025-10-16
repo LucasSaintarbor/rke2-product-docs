@@ -32,9 +32,10 @@ jobs:
           sudo mv vale /usr/local/bin/vale
           vale --version
 
-      - name: 🛠️ Install Asciidoctor for AsciiDoc Linting
-            # Install Asciidoctor 
-            run: sudo apt-get update && sudo apt-get install -y asciidoctor
+      - name: Install Asciidoctor for AsciiDoc Linting
+ 
+        run: |
+          sudo apt-get update && sudo apt-get install -y asciidoctor
 
       - name: ✍️ Run Vale on Changed Files Only
         id: vale_run
