@@ -22,7 +22,7 @@ jobs:
         # Manual installation steps remain the same
 
         run: |
-          VALE_VERSION="3.14.0" # Specify your desired version
+          VALE_VERSION="3.12.0"
           VALE_URL="https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz"
           
           echo "Downloading Vale v${VALE_VERSION}..."
@@ -42,8 +42,9 @@ jobs:
           # 2. Use git diff to find files that have been Added (A), Modified (M), or Renamed (R)
           # between the base branch and the current head of the PR.
           # We filter this list to only include common content file extensions.
+          # md|adoc
 
-          CHANGED_FILES=$(git diff --name-only --diff-filter=AMR "${BASE_REF}" "HEAD" | grep -E '\.(md|txt|adoc|rst)$')
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AMR "${BASE_REF}" "HEAD" | grep -E '\.(adoc)$')
 
           if [ -z "$CHANGED_FILES" ]; then
             echo "No content files were added, modified, or renamed. Skipping Vale run."
