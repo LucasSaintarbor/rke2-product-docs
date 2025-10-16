@@ -37,7 +37,7 @@ jobs:
 
           # Define the path to your custom configuration file
           
-          CUSTOM_CONFIG_PATH="./config/vale/vale.ini"
+          CUSTOM_CONFIG_PATH="./vale.ini"
 
           # Determine the base branch (where the PR is merging into)
           
