@@ -35,11 +35,15 @@ jobs:
         id: vale_run
         run: |
 
-          # 1. Determine the base branch (where the PR is merging into)
+          # Define the path to your custom configuration file
+          
+          CUSTOM_CONFIG_PATH="./config/vale/vale.ini"
+
+          # Determine the base branch (where the PR is merging into)
           
           BASE_REF=${{ github.event.pull_request.base.sha }}
           
-          # 2. Use git diff to find files that have been Added (A), Modified (M), or Renamed (R)
+          # Use git diff to find files that have been Added (A), Modified (M), or Renamed (R)
           # between the base branch and the current head of the PR.
           # We filter this list to only include common content file extensions.
           # md|adoc
@@ -51,7 +55,6 @@ jobs:
             # Set an output to be used in a subsequent step if needed
             echo "files_to_lint=none" >> $GITHUB_OUTPUT
           else
-            echo "The following files will be checked by Vale:"
             echo "$CHANGED_FILES"
             
             # 3. Pass the list of changed files to the Vale CLI
@@ -62,6 +65,6 @@ jobs:
             
             # The vale command will automatically return a non-zero exit code if errors are found,
             # which will fail the GitHub Action step.
-            vale $CHANGED_FILES || true
+            vale --config="${CUSTOM_CONFIG_PATH}" $CHANGED_FILES || true
             
           fi
