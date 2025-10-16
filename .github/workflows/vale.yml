@@ -1,0 +1,68 @@
+name: Vale Lint (Changed Files Only)
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  vale_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout Repository (Full History Needed for Diff)
+        uses: actions/checkout@v4
+        with:
+
+          # Fetch all history to correctly compare the current branch (HEAD) 
+          # against the target branch (e.g., main) to find changes.
+
+          fetch-depth: 0
+
+      - name: ⬇️ Download and Install Vale CLI
+
+        # Manual installation steps remain the same
+
+        run: |
+          VALE_VERSION="3.14.0" # Specify your desired version
+          VALE_URL="https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz"
+          
+          echo "Downloading Vale v${VALE_VERSION}..."
+          curl -L ${VALE_URL} -o vale.tar.gz
+          tar -xzf vale.tar.gz
+          sudo mv vale /usr/local/bin/vale
+          vale --version
+
+      - name: ✍️ Run Vale on Changed Files Only
+        id: vale_run
+        run: |
+
+          # 1. Determine the base branch (where the PR is merging into)
+          
+          BASE_REF=${{ github.event.pull_request.base.sha }}
+          
+          # 2. Use git diff to find files that have been Added (A), Modified (M), or Renamed (R)
+          # between the base branch and the current head of the PR.
+          # We filter this list to only include common content file extensions.
+
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AMR "${BASE_REF}" "HEAD" | grep -E '\.(md|txt|adoc|rst)$')
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No content files were added, modified, or renamed. Skipping Vale run."
+            # Set an output to be used in a subsequent step if needed
+            echo "files_to_lint=none" >> $GITHUB_OUTPUT
+          else
+            echo "The following files will be checked by Vale:"
+            echo "$CHANGED_FILES"
+            
+            # 3. Pass the list of changed files to the Vale CLI
+            #    --no-exit is used here so the script can continue to output the full Vale report
+            #    before we check the exit code. However, since the final exit code of the `vale`
+            #    command itself will fail the step, we can use the simplest command:
+            #    vale $CHANGED_FILES
+            
+            # The vale command will automatically return a non-zero exit code if errors are found,
+            # which will fail the GitHub Action step.
+            vale $CHANGED_FILES
+            
+            # Note: If you wanted to *always* succeed the action step but still see the report, 
+            # you would use `vale $CHANGED_FILES || true` instead.
+          fi
