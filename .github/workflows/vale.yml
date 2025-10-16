@@ -16,6 +16,7 @@ jobs:
           # against the target branch (e.g., main) to find changes.
 
           fetch-depth: 0
+          submodules: true
 
       - name: ⬇️ Download and Install Vale CLI
 
