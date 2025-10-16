@@ -33,8 +33,7 @@ jobs:
           vale --version
 
       - name: 🛠️ Install Asciidoctor for AsciiDoc Linting
-            # Asciidoctor is required by Vale to parse .adoc files.
-            # It's not installed by default on the Ubuntu runner.
+            # Install Asciidoctor 
             run: sudo apt-get update && sudo apt-get install -y asciidoctor
 
       - name: ✍️ Run Vale on Changed Files Only
