@@ -62,8 +62,6 @@ jobs:
             
             # The vale command will automatically return a non-zero exit code if errors are found,
             # which will fail the GitHub Action step.
-            vale $CHANGED_FILES
+            vale $CHANGED_FILES || true
             
-            # Note: If you wanted to *always* succeed the action step but still see the report, 
-            # you would use `vale $CHANGED_FILES || true` instead.
           fi
