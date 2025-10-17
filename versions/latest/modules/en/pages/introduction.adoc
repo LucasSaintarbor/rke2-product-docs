@@ -5,7 +5,7 @@
 
 image::logo-horizontal-rke2.svg[RKE2 Logo, 346,111]
 
-{product-name}, is Rancher's enterprise-ready next-generation Kubernetes distribution. It has also been known as RKE Government.
+{product-name}, is Rancher's enterprise-ready next-generation Kubernetes distribution. It has also been known as RKE Government. Test
 
 It is a fully https://landscape.cncf.io/?group=projects-and-products&view-mode=card&item=platform--certified-kubernetes-distribution--rke-government#app-definition-and-development--application-definition-image-build[conformant Kubernetes distribution] that focuses on security and compliance within the U.S. Federal Government sector.
 
