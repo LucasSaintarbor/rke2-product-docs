@@ -1,6 +1,6 @@
 = Advanced Options and Configuration
 :page-languages: [en, zh]
-:revdate: 2025-07-10
+:revdate: 2025-10-23
 :page-revdate: {revdate}
 
 This section contains advanced information describing the different ways you can run and manage RKE2.
