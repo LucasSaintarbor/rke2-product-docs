@@ -1,0 +1,76 @@
+name: Vale Lint
+
+# Run Vale Lint on changed files only
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  vale_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+
+          # Compare the current branch (HEAD) 
+          # against the target branch (e.g., main) to find changes
+
+          fetch-depth: 0
+          submodules: true
+
+      - name: Download and Install Vale CLI
+
+        # Install Vale CLI
+        # ? Is there a way to not specify the version? 
+
+        run: |
+          VALE_VERSION="3.12.0"
+          VALE_URL="https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz"
+          
+          echo "Downloading Vale v${VALE_VERSION}..."
+          curl -L ${VALE_URL} -o vale.tar.gz
+          tar -xzf vale.tar.gz
+          sudo mv vale /usr/local/bin/vale
+          vale --version
+
+      - name: Install Asciidoctor for AsciiDoc Linting
+
+        # Installing Asciidcotor is required to run Vale for .adoc files
+ 
+        run: |
+          sudo apt-get install -y asciidoctor
+
+      - name: Run Vale on Changed Files Only
+        id: vale_run
+        run: |
+
+          # Define the path to your custom configuration file
+          
+          CUSTOM_CONFIG_PATH=".vale.ini"
+
+          # Determine the base branch (where the PR is merging into)
+          
+          BASE_REF=${{ github.event.pull_request.base.sha }}
+          
+          # Use git diff to find files that have been Added (A), Modified (M), or Renamed (R)
+          # between the base branch and the current head of the PR.
+          # We filter this list to only include common content file extensions.
+          # md|adoc
+
+          CHANGED_FILES=$(git diff --name-only --diff-filter=AMR "${BASE_REF}" "HEAD" | grep -E '\.(adoc)$')
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No content files were added, modified, or renamed. Skipping Vale run."
+            # Set an output to be used in a subsequent step if needed
+            echo "files_to_lint=none" >> $GITHUB_OUTPUT
+          else
+            echo "$CHANGED_FILES"
+            
+            # Pass the list of changed files to the Vale CLI
+            # The vale command will automatically return a non-zero exit code if errors are found, which will fail the GitHub Action step
+
+            vale --config="${CUSTOM_CONFIG_PATH}" $CHANGED_FILES || true
+            
+          fi
